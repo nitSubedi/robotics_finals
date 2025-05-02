@@ -1,68 +1,68 @@
 #!/usr/bin/env pybricks-micropython
-from pybricks.messaging import BluetoothMailboxClient, TextMailbox
 from pybricks.hubs import EV3Brick
-from pybricks.ev3devices import TouchSensor, Motor
-from pybricks.parameters import Port, Button
+from pybricks.ev3devices import Motor
+from pybricks.parameters import Port, Stop, Direction
+from pybricks.tools import wait
+from pybricks.messaging import BluetoothMailboxServer, TextMailbox
 
-# initalizations
 ev3 = EV3Brick()
-client = BluetoothMailboxClient()
-mbox = TextMailbox('command', client)
+left_motor = Motor(Port.A)
+right_motor = Motor(Port.D)
+claw_motor = Motor(Port.C)
+lift_motor = Motor(Port.B)
 
-# connect to server
-SERVER = 'ev3dev'
-print('Connecting to server...')
-client.connect(SERVER)
-print('Connected!')
+server = BluetoothMailboxServer()
+mbox = TextMailbox('command', server)
 
-# keep track of the last button pressed
-last_button = None
-claw_closed = False # start with claw open
+ev3.screen.print('Waiting for connection...')
+server.wait_for_connection()
+ev3.screen.print('Connected!')
+
+# movement functions
+def forward(speed=500):
+    left_motor.run(speed)
+    right_motor.run(speed)
+
+def backward(speed=500):
+    left_motor.run(-speed)
+    right_motor.run(-speed)
+
+def left(speed=500):
+    left_motor.run(-speed)
+    right_motor.run(speed)
+
+def right(speed=500):
+    left_motor.run(speed)
+    right_motor.run(-speed)
+
+# claw functions
+def open_claw():
+    claw_motor.run_time(50, 10000)
+
+def close_claw():
+    claw_motor.run_time(-50, 10000) 
+
+def pickup():
+    lift_motor.run_unitl_stalled(50, then=Stop.hold, duty_limit=50)
+
 
 # main loop
 while True:
-    pressed = ev3.buttons.pressed()
+    mbox.wait()
+    cmd = mbox.read()
+    ev3.screen.clear()
+    ev3.screen.print('Cmd:', cmd)
 
-    if Button.UP in pressed and last_button != Button.UP:
-        mbox.send('forward')
-        ev3.screen.clear()
-        ev3.screen.print('Sent: forward')
-        last_button = Button.UP
-
-    elif Button.DOWN in pressed and last_button != Button.DOWN:
-        mbox.send('backward')
-        ev3.screen.clear()
-        ev3.screen.print('Sent: backward')
-        last_button = Button.DOWN
-
-    elif Button.LEFT in pressed and last_button != Button.LEFT:
-        mbox.send('left')
-        ev3.screen.clear()
-        ev3.screen.print('Sent: left')
-        last_button = Button.LEFT
-
-    elif Button.RIGHT in pressed and last_button != Button.RIGHT:
-        mbox.send('right')
-        ev3.screen.clear()
-        ev3.screen.print('Sent: right')
-        last_button = Button.RIGHT
-
-    elif Button.CENTER in pressed and last_button != Button.CENTER:
-        if claw_closed:
-            mbox.send('release')
-            ev3.screen.clear()
-            ev3.screen.print('Sent: release')
-            claw_closed = False
-        else:
-            mbox.send('pickup')
-            ev3.screen.clear()
-            ev3.screen.print('Sent: pickup')
-            claw_closed = True
-        last_button = Button.CENTER
-
-    # if no button is pressed, clear the screen and reset the last 
-    elif not pressed:
-        last_button = None
-
-    wait(100)
+    if cmd == 'forward':
+        forward()
+    elif cmd == 'backward':
+        backward()
+    elif cmd == 'left':
+        left()
+    elif cmd== 'right':
+        right()
+    elif cmd == 'pickup':
+        close_claw()
+    elif cmd == 'release':
+        open_claw()
 
