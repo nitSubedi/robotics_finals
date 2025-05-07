@@ -6,8 +6,9 @@
 from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import Motor
 from pybricks.parameters import Port, Stop, Direction
-from pybricks.tools import wait
+from pybricks.tools import wait, StopWatch
 from pybricks.messaging import BluetoothMailboxClient, TextMailbox
+from pybricks.robotics import DriveBase
 
 ev3 = EV3Brick()
 left_motor = Motor(Port.D)
@@ -35,23 +36,27 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 
 claw_open = True
 
+
 while True:
-    
+
     if mbox.read() == 'forward':
+        robot.straight(2)
+    elif mbox.read()=='fast_forward':
         robot.drive(200, 0)
-        robot.drive(200,0)
     elif mbox.read() == 'backward':
-        left_motor.run(-200)
-        right_motor.run(-200)
+        robot.straight(-2)
+    elif mbox.read() == 'fast_backward':
+        robot.drive(-200, 0)
+    elif mbox.read()=="left_fast":
+        robot.drive(0, -25)
     elif mbox.read() == 'left':
-        left_motor.run(-20)
-        right_motor.run(20)
+        robot.drive(0, -2)
+    elif mbox.read() == 'right_fast':
+        robot.drive(0, 25)
     elif mbox.read() == 'right':
-        left_motor.run(20)
-        right_motor.run(-20)
+        robot.drive(0, 2)
     elif mbox.read() == 'stop':
-        left_motor.stop()
-        right_motor.stop()
+        robot.stop()
     elif mbox.read() == 'claw_open':
         claw_motor.run(100)
     elif mbox.read() == 'claw_close':   
@@ -65,6 +70,5 @@ while True:
     elif mbox.read() == 'lift_stop':
         lift_motor.stop(Stop.HOLD)
     else:
-        left_motor.run(0)
-        right_motor.run(0)
+        robot.stop()
     wait(10)

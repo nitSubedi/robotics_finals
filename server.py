@@ -26,7 +26,9 @@ ev3 = EV3Brick()
 
 # keep track of the last button pressed
 last_button = None
+
 claw_closed = False # start with claw open
+
 
 
 
@@ -76,43 +78,94 @@ while True:
         wait(100)
 
     if Button.UP in button:
-        while Button.UP in button:
-            button = ev3.buttons.pressed()
-            mbox.send('forward')
-            wait(500)
-            ev3.screen.clear()
-            ev3.screen.print('Sent: forward')
+           
+        if Button.RIGHT in button:
+            while Button.RIGHT in button:
+                button = ev3.buttons.pressed()
+                mbox.send('fast_forward')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: fast_forward')
+        elif Button.LEFT in button:
+            while Button.LEFT in button:
+                button = ev3.buttons.pressed()
+                mbox.send('left_fast')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: left_fast')
+        else:
+            while Button.UP in button:
+                button = ev3.buttons.pressed()
+                mbox.send('forward')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: forward')
+        
         ev3.screen.clear()
+        
         mbox.send('stop')
 #
     if Button.DOWN in button:
-        while Button.DOWN in button:
-            button = ev3.buttons.pressed()
-            mbox.send('backward')
-            wait(500)
-            ev3.screen.clear()
-            ev3.screen.print('Sent: backward')
+        
+        if Button.LEFT in button:
+            while Button.LEFT in button:
+                button = ev3.buttons.pressed()
+                mbox.send('fast_backward')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: fast_backward')
+        elif Button.RIGHT in button:
+            while Button.RIGHT in button:
+                button = ev3.buttons.pressed()
+                mbox.send('right_fast')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: right_fast')
+        else:
+            while Button.DOWN in button:
+                button = ev3.buttons.pressed()
+                mbox.send('backward')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: backward')
         ev3.screen.clear()
         mbox.send('stop')
   
     if Button.LEFT in button:
-        while Button.LEFT in button:
-            button = ev3.buttons.pressed()
-            mbox.send('left')
-            wait(500)
-            ev3.screen.clear()
-            ev3.screen.print('Sent: left')
+        if Button.UP in button:
+            while Button.UP in button:
+                button = ev3.buttons.pressed()
+                mbox.send('left_fast')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: left_fast')
+        else:
+            while Button.LEFT in button:
+                button = ev3.buttons.pressed()
+                mbox.send('left')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: left')
         ev3.screen.clear()
         mbox.send('stop')
     if Button.RIGHT in button:
-        while Button.RIGHT in button:
-            button = ev3.buttons.pressed()
-            mbox.send('right')
-            wait(500)
-            ev3.screen.clear()
-            ev3.screen.print('Sent: right')
+        if Button.DOWN in button:
+            while Button.DOWN in button:
+                button = ev3.buttons.pressed()
+                mbox.send('right_fast')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: right_fast')
+        else:
+            while Button.RIGHT in button:
+                button = ev3.buttons.pressed()
+                mbox.send('right')
+                wait(500)
+                ev3.screen.clear()
+                ev3.screen.print('Sent: right')
         ev3.screen.clear()
         mbox.send('stop')
+
     
 #
     
